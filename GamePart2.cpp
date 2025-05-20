@@ -47,10 +47,25 @@ int larguraConsole() {
 }
 
 ///Função pra printar no meio da tela
-void textoCentralizado(const string& texto) {
-    int largura_console = larguraConsole();
-    int spaces = (largura_console - texto.length()) / 2;
-    cout << string(spaces, ' ') << texto << endl;
+void textoCentralizado(const string& texto, int cor = 7) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+
+    int espacos = (csbi.srWindow.Right - texto.length()) / 2;
+    SetConsoleTextAttribute(hConsole, cor);
+    cout << string(espacos, ' ') << texto << endl;
+    SetConsoleTextAttribute(hConsole, 7); // Reset para branco
+}
+
+void textoCentralizado(const string& texto, const string& corHex) {
+    int cor;
+    try {
+        cor = stoi(corHex, nullptr, 16); // Converte hex string para int
+    } catch (...) {
+        cor = 7; // Valor padrão em caso de erro
+    }
+    textoCentralizado(texto, cor); // Chama a versão numérica
 }
 
 //Função para limpar apenas uma area da tela
@@ -120,23 +135,17 @@ void informacoesMenu(){
 
         // imprime informações quando o cursor estiver em cima de inimigos
        if(cursorInfMenuPrincipal == 0){
-            posicao(0, 7);  textoCentralizado("CORES DOS INIMIGOS (I) DO MAIS FRACO AO MAIS FORTE: ");
-            mudarCor(hConsole, 0x8); // cinza escuro
+            posicao(0, 7);  textoCentralizado("CORES DOS INIMIGOS (I) DO MAIS FRACO AO MAIS FORTE: ", 8);
 
-            mudarCor(hConsole, 0xA); // verde claro
-            posicao(0, 9);  textoCentralizado("verde claro");
+            posicao(0, 9);  textoCentralizado("verde claro", 0xA); // verde claro
 
-            mudarCor(hConsole, 0x2); // verde escuro
-            posicao(0, 11); textoCentralizado("verde escuro");
+            posicao(0, 11); textoCentralizado("verde escuro", 2); // verde escuro
 
-            mudarCor(hConsole, 0xE); // amarelo claro
-            posicao(0, 13); textoCentralizado("amarelo claro");
+            posicao(0, 13); textoCentralizado("amarelo claro", 0xE); // amarelo claro
 
-            mudarCor(hConsole, 0x6); // amarelo escuro
-            posicao(0, 15); textoCentralizado("amarelo escuro");
+            posicao(0, 15); textoCentralizado("amarelo escuro", 6); // amarelo escuro
 
-            mudarCor(hConsole, 0x4); // vermelho escuro
-            posicao(0, 17); textoCentralizado("B vermelho = Boss");
+            posicao(0, 17); textoCentralizado("B vermelho = Boss", 4); // vermelho escuro
         }
 
         // imprime informações quando o cursor estiver em cima de mapa e itens
@@ -156,20 +165,15 @@ void informacoesMenu(){
             posicao(0, 9); textoCentralizado("Adiquirir qualquer item = 10 pontos");
             posicao(0, 11);  textoCentralizado("inimigos dao pontos dependendo de sua forca");
 
-            mudarCor(hConsole, 0xA); // verde claro
-            posicao(0, 13); textoCentralizado("verde claro = 5");
+            posicao(0, 13); textoCentralizado("verde claro = 5", 0xA);// verde claro
 
-            mudarCor(hConsole, 0x2); // verde escuro
-            posicao(0, 15); textoCentralizado("verde escuro = 10");
+            posicao(0, 15); textoCentralizado("verde escuro = 10", 2);// verde escuro
 
-            mudarCor(hConsole, 0xE); // amarelo claro
-            posicao(0, 17); textoCentralizado("amarelo claro = 15");
+            posicao(0, 17); textoCentralizado("amarelo claro = 15", 0xE);// amarelo claro
 
-            mudarCor(hConsole, 0x6); // amarelo escuro
-            posicao(0, 19); textoCentralizado("amarelo escuro = 20");
+            posicao(0, 19); textoCentralizado("amarelo escuro = 20", 6);// amarelo escuro
 
-            mudarCor(hConsole, 0x4); // vermelho escuro
-            posicao(0, 21); textoCentralizado("vermelho = 25");
+            posicao(0, 21); textoCentralizado("vermelho = 25", 4);// vermelho escuro
         }
 
 
@@ -205,7 +209,6 @@ void creditos(){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
     system("cls");
-    mudarCor(hConsole, 0x7); // branco
 
     posicao(0, 9); textoCentralizado("Universidade do Vale do Itajai");
     posicao(0, 13); textoCentralizado("Professor: Alex Luciano Roesler Rese");
@@ -250,9 +253,7 @@ void exibirTop10() {
 
     system("cls");
 
-    textoCentralizado("=== TOP 10 ===");
-
-    mudarCor(hConsole, 0x7); //branco
+    textoCentralizado("=== TOP 10 ===", 5);
 
     cout << endl << endl;
 
