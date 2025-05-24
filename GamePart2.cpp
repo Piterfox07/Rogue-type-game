@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <fstream>
 #include <string>
+#include <chrono>
+#include <thread>
 
 #define ALTURA 25
 #define LARGURA 40
@@ -523,10 +525,10 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
         if(newX >= 0 && newX < ALTURA && newY >= 0 && newY < LARGURA) {
 
             //Apaga mensagens da parte inferior da tela ao andar
-            posicao(0,25); cout << "                                                                 ";
             posicao(0,26); cout << "                                                                 ";
             posicao(0,27); cout << "                                                                 ";
             posicao(0,28); cout << "                                                                 ";
+            posicao(0,29); cout << "                                                                 ";
 
             if(m[newX][newY] != 1 && m[newX][newY] != 0) {  // Permite movimento em qualquer tile que não seja parede
                 personagem.pontoPersonagem.x = newX;
@@ -544,7 +546,7 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
                 // Verifica armadilhas
                 if(m[personagem.pontoPersonagem.x][personagem.pontoPersonagem.y] == 4) {
                     personagem.vida -= 10;
-                    posicao(2,25); cout << "Voce pisou em uma armadilha!   Perdeu 10 de vida.                    ";
+                    posicao(2,26); cout << "Voce pisou em uma armadilha!   Perdeu 10 de vida.                    ";
                 }
             }
         }
@@ -605,6 +607,24 @@ void fimDeJogo(StatusPersonagem& personagem, bool venceu) {
     }
 }
 
+void cronometro(auto &inicio, int minuto = 0) {
+    posicao(0, 0);
+    // Espera por um segundo antes de mostrar o tempo
+    auto agora = chrono::steady_clock::now();
+    auto duracao = chrono::duration_cast<chrono::seconds>(agora - inicio);
+
+    if(duracao.count() == 60) {
+        inicio = chrono::steady_clock::now();
+        minuto++;
+    }
+    cout << "Tempo: " << minuto << ":" ;
+
+    if(duracao.count() < 10) {
+        cout << "0";
+    }
+    cout << duracao.count() << endl;
+}
+
 int main(){
     ///ALERTA: NAO MODIFICAR O TRECHO DE CODIGO, A SEGUIR.
         //INICIO: COMANDOS PARA QUE O CURSOR NAO FIQUE PISCANDO NA TELA
@@ -641,7 +661,6 @@ int main(){
     inimigo[4].pontoInimigos = {20, 38};
 
     printarMenuInicial();
-
     //Mapa do jogo
     int m[ALTURA][LARGURA] = {
         {1,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,0,0},
@@ -685,8 +704,13 @@ int main(){
         }
     }
 
+    auto inicio = chrono::steady_clock::now();  // Marca o tempo de inC-cio
+    int minuto = 0;
+
     while (true){
-        posicao(0, 0);
+		posicao(0, 0);
+
+		cronometro(inicio, minuto);
 
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         mudarCor(hConsole, 0x0F);
@@ -751,9 +775,9 @@ int main(){
         if(ItemSecretoColetado == false){
             if (personagem.pontoPersonagem.x == 2 && personagem.pontoPersonagem.y == 33){
                 personagem.nivel++;
-                personagem.Score += 10;
+                personagem.Score += 10 - minuto;
                 ItemSecretoColetado = true;
-                posicao(2,25); cout << "Voce coleteou um item secreto, recebeu um nivel!                 ";
+                posicao(2,26); cout << "Voce coleteou um item secreto, recebeu um nivel!                 ";
             }
         }
 
@@ -767,9 +791,9 @@ int main(){
             personagem.ataque += 5;
             personagem.VidaMaxima += 10;
             personagem.armadura += 1;
-            personagem.Score += 20;
+            personagem.Score += 20 - minuto;
             proximoNivel++;
-            posicao(2,25); cout << "Voce subiu de nivel, seus status aumentaram!                    ";
+            posicao(2,26); cout << "Voce subiu de nivel, seus status aumentaram!                    ";
         }
 
         //Dano do inimigo ao player e Dano do player ao inimigo
@@ -777,6 +801,7 @@ int main(){
             if (personagem.pontoPersonagem.x == inimigo[i].pontoInimigos.x &&
                 personagem.pontoPersonagem.y == inimigo[i].pontoInimigos.y &&
                 inimigo[i].vivo) {
+
 
                 int totalDanoCausado = 0;
                 int totalDanoRecebido = 0;
@@ -797,14 +822,14 @@ int main(){
                         totalDanoRecebido += danoInimigoTurno;
                     }
 
-                    posicao(2, 25); cout << "Turno " << turno << ": Voce causou " << danoTurno << " (" << totalDanoCausado << " total)";
-                    posicao(2, 26); cout << "Turno " << turno << ": Inimigo causou " << danoInimigoTurno << " (" << totalDanoRecebido << " total)";
+                    posicao(2, 26); cout << "Turno " << turno << ": Voce causou " << danoTurno << " (" << totalDanoCausado << " total)";
+                    posicao(2, 27); cout << "Turno " << turno << ": Inimigo causou " << danoInimigoTurno << " (" << totalDanoRecebido << " total)";
 
-                    Sleep(2000); /// Tempo de 2s pra ler as msgm
+                    Sleep(1000); /// Tempo de 2s pra ler as msgm
 
                     // Verifica morte do inimigo
                     if (inimigo[i].vida <= 0) {
-                        posicao(2, 27);
+                        posicao(2, 28);
                         cout << "[INIMIGO DERROTADO!] XP: +15 | Pontos: +" << (5 * (i + 1));
                         inimigo[i].vivo = false;
                         personagem.experiencia += 15;
@@ -814,21 +839,21 @@ int main(){
                     turno++; // Passa o turno
 
                     // Limpa apenas as linhas de status
-                    posicao(2, 25); cout << "                                                          ";
                     posicao(2, 26); cout << "                                                          ";
+                    posicao(2, 27); cout << "                                                          ";
                 }
 
                 // Mensagem final do combate
-                posicao(2, 25);
-                cout << "Dano total causado: " << totalDanoCausado;
                 posicao(2, 26);
+                cout << "Dano total causado: " << totalDanoCausado;
+                posicao(2, 27);
                 cout << "Dano total recebido: " << totalDanoRecebido;
-                Sleep(3000);
+                Sleep(1000);
 
                 // Limpa area de mensagens
-                posicao(0, 25); cout << "                                                                 ";
                 posicao(0, 26); cout << "                                                                 ";
                 posicao(0, 27); cout << "                                                                 ";
+                posicao(0, 28); cout << "                                                                 ";
 
                 limparBufferDeInput();
                 break;
@@ -842,8 +867,8 @@ int main(){
                 EspadaColetada = true;
                 personagem.ataque += 5;
                 personagem.experiencia += 15;
-                personagem.Score += 10;
-                posicao(2,25); cout << "Espada coletada (+5 de Dano)!                                    ";
+                personagem.Score += 10 - minuto;
+                posicao(2,26); cout << "Espada coletada (+5 de Dano)!                                    ";
             }
         }
         if (PocaoColetada == false){
@@ -851,8 +876,8 @@ int main(){
                 PocaoColetada = true;
                 Items.PocaoCura++;
                 personagem.experiencia += 15;
-                personagem.Score += 10;
-                posicao(2,25); cout << "Voce coletou uma pocao de cura!                                  ";
+                personagem.Score += 10 - minuto;
+                posicao(2,26); cout << "Voce coletou uma pocao de cura!                                  ";
             }
         }
 
