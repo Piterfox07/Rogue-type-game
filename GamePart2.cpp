@@ -295,7 +295,7 @@ int nivelDificuldade(bool &finalizarMenuPrincipal){
         system("cls");
 
         posicao(0, 11); textoCentralizado("Escolha o nivel de dificuldade que deseja jogar:", 12);
-        posicao(0, 13); textoCentralizado("1 - SANDBOX - visao infinita + vida infinita + dano infinito");
+        posicao(0, 13); textoCentralizado("1 - SANDBOX - Imortalidade + One Punch");
         posicao(0, 15); textoCentralizado("2 - FACIL - chance de acerto garantida");
         posicao(0, 17); textoCentralizado("3 - MEDIO - dificuldade padrao");
         posicao(0, 28); cout << "Pressione qualquer outra tecla para retornar";
@@ -767,19 +767,9 @@ void terceiromapa(int m[ALTURA][LARGURA], StatusPersonagem &personagem, bool rev
     personagem.pontoPersonagem.y = 17;
 }
 
-void revelarAreaInicial(StatusPersonagem &personagem, bool revelado[ALTURA][LARGURA], int dificuldade) {
-    int visaoPadrao = 4;
-    int visaoSandbox = 100;
-    int visao;
-
-    if (dificuldade == 1){
-        visao = visaoSandbox;
-    } else {
-        visao = visaoPadrao;
-    }
-
-    for(int i = personagem.pontoPersonagem.x - visao; i <= personagem.pontoPersonagem.x + visao; i++) {
-        for(int j = personagem.pontoPersonagem.y - visao; j <= personagem.pontoPersonagem.y + visao; j++) {
+void revelarAreaInicial(StatusPersonagem &personagem, bool revelado[ALTURA][LARGURA]) {
+    for(int i = personagem.pontoPersonagem.x - 4; i <= personagem.pontoPersonagem.x + 4; i++) {
+        for(int j = personagem.pontoPersonagem.y - 4; j <= personagem.pontoPersonagem.y + 4; j++) {
             if(i >= 0 && i < ALTURA && j >= 0 && j < LARGURA) {
                 revelado[i][j] = true;
             }
@@ -835,7 +825,7 @@ void melhorarAtributos(int &Upgrade, StatusPersonagem &personagem, StatusItems i
     }
 }
 
-void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int m[ALTURA][LARGURA], bool revelado[ALTURA][LARGURA], char tecla,int &mapaatual, int &Upgrade, int dificuldade) {
+void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int m[ALTURA][LARGURA], bool revelado[ALTURA][LARGURA], char tecla,int &mapaatual, int &Upgrade) {
 
     bool emCombate = false;
 
@@ -885,17 +875,9 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
                 personagem.pontoPersonagem.x = newX;
                 personagem.pontoPersonagem.y = newY;
 
-                int visaoPadrao = 4, visaoSandbox = 100, visao;
-
-                if (dificuldade == 1){
-                    visao = visaoSandbox;
-                } else {
-                    visao = visaoPadrao;
-                }
-
                 // Revela área ao redor (5x5)
-                for (int i = personagem.pontoPersonagem.x - visao; i <= personagem.pontoPersonagem.x + visao; i++) {
-                    for (int j = personagem.pontoPersonagem.y - visao; j <= personagem.pontoPersonagem.y + visao; j++) {
+                for (int i = personagem.pontoPersonagem.x - 4; i <= personagem.pontoPersonagem.x + 4; i++) {
+                    for (int j = personagem.pontoPersonagem.y - 4; j <= personagem.pontoPersonagem.y + 4; j++) {
                         if (i >= 0 && i < ALTURA && j >= 0 && j < LARGURA) {
                             revelado[i][j] = true;
                         }
@@ -919,13 +901,13 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
                                     limparTela(0,0,80,30);
                                     segundomapa(m, personagem, revelado,inimigo);
                                     mapaatual++;
-                                    revelarAreaInicial(personagem, revelado, dificuldade); break;
+                                    revelarAreaInicial(personagem, revelado); break;
                                 case 2:
                                     limparTela(0,0,80,30);
                                     terceiromapa(m, personagem, revelado, inimigo);
                                     mapaatual++;
                                     limparTela(0,0,20,30);
-                                    revelarAreaInicial(personagem, revelado, dificuldade); break;
+                                    revelarAreaInicial(personagem, revelado); break;
                             }
                         case '2': break;
                         default: break;
@@ -962,7 +944,7 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
     }
 }
 
-void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int EspicialAtaque, int AumentaProbabilidadeAtaqueCombate, int BotasDeAgilidadeCombate, int minuto, int dificuldade){
+void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int EspicialAtaque, int AumentaProbabilidadeAtaqueCombate, int BotasDeAgilidadeCombate, int minuto){
     bool Entrandocombate = true;
     for (int i = 0; i < INIMIGOS; i++) {
         if (personagem.pontoPersonagem.x == inimigo[i].pontoInimigos.x &&
@@ -1143,7 +1125,6 @@ int main(){
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     };
 
-    int visaoPadrao = 4, visaoSandbox = 100, visao;
     StatusPersonagem personagem = {1, 0, 100, 0, 0, 0, 0, {1,3}}; // nivel, ataque, vida, armadura, experiencia, VidaMaxima, Score, localizacao (cordenadas x e y);
     StatusItems Items ={1, 1, 1, {1, 29}, {10, 76}, {12,76},1, 1, 1, 1, {21, 10}, {19, 22}, {19, 62}, {3, 22} };
     StatusInimigos inimigo[INIMIGOS] = {0};
@@ -1152,11 +1133,10 @@ int main(){
         personagem.ataque = 999;
         personagem.VidaMaxima = 999;
         personagem.vida = 999;
-        visao = visaoSandbox;
+        personagem.armadura = 999;
     } else {
         personagem.ataque = 5;
         personagem.VidaMaxima = 100;
-        visao = visaoPadrao;
     }
 
     primeiromapa(m, personagem);
@@ -1198,9 +1178,9 @@ int main(){
     // o jogador vai ter vantagens de ataque em +1quando forem coletados;
     int AumentaProbabilidadeAtaqueCombate = 0;
 
-
-    for (int i = personagem.pontoPersonagem.x - visao; i <= personagem.pontoPersonagem.x + visao; i++) {
-        for (int j = personagem.pontoPersonagem.y - visao; j <= personagem.pontoPersonagem.y + visao; j++) {
+    // Revela 2 caracteres pra cima, baixo, direita e esquerda do jogador
+    for (int i = personagem.pontoPersonagem.x - 4; i <= personagem.pontoPersonagem.x + 4; i++) {
+        for (int j = personagem.pontoPersonagem.y - 4; j <= personagem.pontoPersonagem.y + 4; j++) {
             if (i >= 0 && i < ALTURA && j >= 0 && j < LARGURA) {
                 revelado[i][j] = true;
             }
@@ -1437,8 +1417,8 @@ int main(){
         // Movimentação
         if (_kbhit()) { //Se estiver pressionando uma tecla
             tecla = getch(); //Recebe o valor da tecla pressionada
-            movimentacao(personagem, inimigo, Items, m, revelado, tecla, mapaatual, Upgrade, dificuldade);
-            Combate(personagem , inimigo, Items, EspicialAtaque, AumentaProbabilidadeAtaqueCombate, BotasDeAgilidadeCombate, minuto, dificuldade);
+            movimentacao(personagem, inimigo, Items, m, revelado, tecla, mapaatual, Upgrade);
+            Combate(personagem , inimigo, Items, EspicialAtaque, AumentaProbabilidadeAtaqueCombate, BotasDeAgilidadeCombate, minuto);
         }
 
         printarBordaMenu();
