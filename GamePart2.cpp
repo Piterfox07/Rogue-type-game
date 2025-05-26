@@ -7,11 +7,17 @@
 #include <chrono>
 #include <thread>
 
+#define LARGURA 80
 #define ALTURA 25
-#define LARGURA 40
-#define INIMIGOS 5
+#define INIMIGOS 9
 
 using namespace std;
+
+template <typename ar>
+
+ar armaduraPotente(ar& a, ar b){
+    return a - b;
+}
 
 struct Ponto{
     int x, y;
@@ -19,12 +25,17 @@ struct Ponto{
 struct StatusItems{
     int PocaoCura, Espada, PowerUp;
     Ponto pontoEspada, pontoPocaoCura, pontoPowerUp;
+    int Escudo,SuperBotasDeAgilidade,CristalVida,AumentaProbabilidadeAtaque;
+    Ponto pontoEscudo, pontoBotasDeAgilidade, pontoCristalVida, pontoAumentaProbabilidadeAtaque;
+
 };
 
 struct StatusPersonagem{
     int nivel, ataque, vida,armadura, experiencia, VidaMaxima, Score;
     Ponto pontoPersonagem;
     string nome;
+    int cor = 15;
+    int nivelDificuldade;
 };
 
 struct StatusInimigos{
@@ -137,45 +148,54 @@ void informacoesMenu(){
 
         // imprime informações quando o cursor estiver em cima de inimigos
        if(cursorInfMenuPrincipal == 0){
-            posicao(0, 7);  textoCentralizado("CORES DOS INIMIGOS (I) DO MAIS FRACO AO MAIS FORTE: ", 8);
+            posicao(0, 7);  textoCentralizado("TAXA DE ACERTO DE ATAQUES INIMIGOS AUMENTA COM A DIFICULDADE", 8);
 
-            posicao(0, 9);  textoCentralizado("verde claro", 0xA); // verde claro
+            posicao(0, 9);  textoCentralizado("VIDA DOS INIMIGOS AUMENTA DE ACORDO COM O MAPA ATUAL", 8);
 
-            posicao(0, 11); textoCentralizado("verde escuro", 2); // verde escuro
+            posicao(0, 11);  textoCentralizado("CORES DOS INIMIGOS (I) DO MAIS FRACO AO MAIS FORTE: ", 8);
 
-            posicao(0, 13); textoCentralizado("amarelo claro", 0xE); // amarelo claro
+            posicao(0, 15);  textoCentralizado("verde claro", 0xA); // verde claro
 
-            posicao(0, 15); textoCentralizado("amarelo escuro", 6); // amarelo escuro
+            posicao(0, 17); textoCentralizado("verde escuro", 2); // verde escuro
 
-            posicao(0, 17); textoCentralizado("B vermelho = Boss", 4); // vermelho escuro
+            posicao(0, 19); textoCentralizado("amarelo claro", 0xE); // amarelo claro
+
+            posicao(0, 21); textoCentralizado("amarelo escuro", 6); // amarelo escuro
+
+            posicao(0, 23); textoCentralizado("B vermelho = Boss", 4); // vermelho escuro
         }
 
         // imprime informações quando o cursor estiver em cima de mapa e itens
         if(cursorInfMenuPrincipal == 1){
-            posicao(0, 7);  textoCentralizado("X = Armadilhas (-10 de vida)");
-            posicao(0, 9);  textoCentralizado("E = espada (+5 de dano)");
-            posicao(0, 11); textoCentralizado("C = pocao de cura (+50 de vida)");
-            posicao(0, 13); textoCentralizado("pressione R para usar a pocao");
-            posicao(0, 15); textoCentralizado("existem locais escondidos");
-            posicao(0, 17); textoCentralizado("Y = item secreto (upa um nivel)");
-            posicao(0, 18); textoCentralizado("(o item secreto ultiliza automaticamente)");
+            posicao(0, 7);  textoCentralizado("X = Armadilhas (-10 de Vida)");
+            posicao(0, 9);  textoCentralizado("E = espada (+5 de Dano)");
+            posicao(0, 11); textoCentralizado("C = pocao de cura (+50 de Vida)");
+            posicao(0, 12); textoCentralizado("(pressione R para usar a pocao)");
+            posicao(0, 14); textoCentralizado("T = Tecnica de combate (chance de acerto++)");
+            posicao(0, 16); textoCentralizado("Y = item secreto (upa um nivel)");
+            posicao(0, 17); textoCentralizado("(o item secreto ultiliza automaticamente)");
+            posicao(0, 19); textoCentralizado("V = Cristal de Vida (+20 de vida maxima)");
+            posicao(0, 21); textoCentralizado("A = Botas da Agilidade (chance de desviar++)");
+            posicao(0, 23); textoCentralizado("O = Escudo (+1 de Defesa)");
         }
 
         // imprime informações quando o cursor estiver em cima de score
         if(cursorInfMenuPrincipal == 2){
-            posicao(0, 7);  textoCentralizado("subir de nivel = 20 pontos");
-            posicao(0, 9); textoCentralizado("Adiquirir qualquer item = 10 pontos");
-            posicao(0, 11);  textoCentralizado("inimigos dao pontos dependendo de sua forca");
+            posicao(0, 7); textoCentralizado("CADA MINUTO QUE PASSA OS PONTOS ADIQUIRIDOS DIMINUEM EM 1", 8);
+            posicao(0, 8); textoCentralizado("(podendo reduzir sua pontuacao)", 8);
+            posicao(0, 10); textoCentralizado("subir de nivel = 40 pontos");
+            posicao(0, 12); textoCentralizado("Adiquirir qualquer item = 20 pontos");
+            posicao(0, 14); textoCentralizado("inimigos dao pontos dependendo de sua forca");
 
-            posicao(0, 13); textoCentralizado("verde claro = 5", 0xA);// verde claro
+            posicao(0, 16); textoCentralizado("verde claro = 10", 0xA);// verde claro
 
-            posicao(0, 15); textoCentralizado("verde escuro = 10", 2);// verde escuro
+            posicao(0, 18); textoCentralizado("verde escuro = 15", 2);// verde escuro
 
-            posicao(0, 17); textoCentralizado("amarelo claro = 15", 0xE);// amarelo claro
+            posicao(0, 20); textoCentralizado("amarelo claro = 20", 0xE);// amarelo claro
 
-            posicao(0, 19); textoCentralizado("amarelo escuro = 20", 6);// amarelo escuro
+            posicao(0, 22); textoCentralizado("amarelo escuro = 25", 6);// amarelo escuro
 
-            posicao(0, 21); textoCentralizado("vermelho = 25", 4);// vermelho escuro
+            posicao(0, 24); textoCentralizado("vermelho = 100", 4);// vermelho escuro
         }
 
 
@@ -202,7 +222,6 @@ void informacoesMenu(){
                 cursorAnterior = cursorInfMenuPrincipal;
             }
         }
-
     }
 }
 
@@ -270,12 +289,81 @@ void exibirTop10() {
     system("cls");
 }
 
+int nivelDificuldade(bool &finalizarMenuPrincipal){
+
+    while(true){
+        system("cls");
+
+        posicao(0, 11); textoCentralizado("Escolha o nivel de dificuldade que deseja jogar:", 12);
+        posicao(0, 13); textoCentralizado("1 - SANDBOX - visao infinita + vida infinita + dano infinito");
+        posicao(0, 15); textoCentralizado("2 - FACIL - chance de acerto garantida");
+        posicao(0, 17); textoCentralizado("3 - MEDIO - dificuldade padrao");
+        posicao(0, 28); cout << "Pressione qualquer outra tecla para retornar";
+
+        char tecla = getch();
+
+        switch(tecla){
+            case '1':
+                while(true){
+                    system("cls");
+                    posicao(0, 11); textoCentralizado("Tem certeza que deseja escolher a dificuldade SANDBOX?", 12);
+                    posicao(0, 13); textoCentralizado("1 - Sim          2 - Nao");
+
+                    char confirmar = getch();
+                    if (confirmar == '1') {
+                        finalizarMenuPrincipal = true;
+                        return 1;
+                    } else if (confirmar == '2') {
+                        break;
+                    }
+                }
+                break;
+
+            case '2':
+                while(true){
+                    system("cls");
+                    posicao(0, 11); textoCentralizado("Tem certeza que deseja escolher a dificuldade FACIL?", 12);
+                    posicao(0, 13); textoCentralizado("1 - Sim          2 - Nao");
+
+                    char confirmar = getch();
+                    if (confirmar == '1') {
+                        finalizarMenuPrincipal = true;
+                        return 2;
+                    } else if (confirmar == '2') {
+                        break; // <-- Sai da confirmação e volta para o menu principal
+                    }
+                }
+                break;
+
+            case '3':
+                while(true){
+                    system("cls");
+                    posicao(0, 11); textoCentralizado("Tem certeza que deseja escolher a dificuldade MEDIA?", 12);
+                    posicao(0, 13); textoCentralizado("1 - Sim          2 - Nao");
+
+                    char confirmar = getch();
+                    if (confirmar == '1') {
+                        finalizarMenuPrincipal = true;
+                        return 3;
+                    } else if (confirmar == '2') {
+                        break;
+                    }
+                }
+                break;
+
+            default:
+                return 0;
+        }
+    }
+}
+
 //Menu principal do jogo (que aparece no inicio)
-void printarMenuInicial(){
+int printarMenuInicial(){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     int cursorMenuPrincipal=0, cursorMenuPrincipalNew;
     char teclaMenuPrincipal;
     bool finalizarMenuPrincipal = false;
+    int dificuldade;
 
     while(finalizarMenuPrincipal==false){
         mudarCor(hConsole, 0x7); // branco
@@ -329,7 +417,7 @@ void printarMenuInicial(){
                 case 80: case 's': case 'S': cursorMenuPrincipalNew++; break; // Baixo
                 case 13: case ' ': //espaço ou enter para confirmar
                 if(cursorMenuPrincipal==0){ // limpa a tela e finaliza a função
-                    finalizarMenuPrincipal=true;
+                    dificuldade = nivelDificuldade(finalizarMenuPrincipal);
                     system("cls");
                 }else if(cursorMenuPrincipal==1){ // limpa a tela e abre informações
                     system("cls");
@@ -351,10 +439,13 @@ void printarMenuInicial(){
             }
         }
     }
+    if (finalizarMenuPrincipal == true && dificuldade > 0){
+        return dificuldade;
+    }
 }
 
 //Printa a borda do menu da direita
-void printarBordaMenu (){
+void printarBordaMenu(){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     mudarCor(hConsole, 0x07);
 
@@ -449,7 +540,7 @@ void printarMenu(){
 }
 
 //Imprime os status dentro da borda
-void Status(StatusPersonagem status, StatusItems item){
+void Status(StatusPersonagem status, StatusItems item, int Upgrade){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
     mudarCor(hConsole, 0x7); // branco
@@ -477,6 +568,8 @@ void Status(StatusPersonagem status, StatusItems item){
     posicao(92, 16); cout << "Pocoes de cura:[" << item.PocaoCura << "]   ";
 
     mudarCor(hConsole, 0x7);
+    posicao(92, 18);
+    cout << "Pontos de status:  " << "[" << Upgrade <<"]";
 }
 
 void limparBufferDeInput() {
@@ -485,7 +578,264 @@ void limparBufferDeInput() {
     }
 }
 
-void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int m[ALTURA][LARGURA], bool revelado[ALTURA][LARGURA], char tecla) {
+void salvarPontuacao(StatusPersonagem personagem) {
+    ofstream arquivo("pontuacao.txt", ios::app);
+    if (arquivo.is_open()) {
+        arquivo << personagem.nome << ": " << personagem.Score << endl;
+        arquivo.close();
+    }
+}
+
+void fimDeJogo(StatusPersonagem& personagem, bool venceu) {
+    system("cls");
+    cout << "Fim de jogo! " << (venceu ? "Você venceu!" : "Você morreu!") << endl;
+    cout << "Sua pontuação final foi de: " << personagem.Score << " pts." << endl;
+
+    cout << "Digite seu nome: ";
+    cin >> personagem.nome;
+
+    if (personagem.nome == "apagarArquivo") {
+        ofstream arquivo("pontuacao.txt", ios::trunc);
+        arquivo.close();
+        cout << "Pontuações resetadas!" << endl;
+    } else if (personagem.nome == "rodadaTeste"){
+        cout << "Sua pontuação nao foi salva!" << endl;
+    }else {
+        salvarPontuacao(personagem);
+        cout << "Pontuação salva!" << endl;
+    }
+}
+
+void cronometro(auto &inicio, int &minuto = 0) {
+    posicao(0, 0);
+    // Espera por um segundo antes de mostrar o tempo
+    auto agora = chrono::steady_clock::now();
+    auto duracao = chrono::duration_cast<chrono::seconds>(agora - inicio);
+
+    if(duracao.count() == 60) {
+        inicio = chrono::steady_clock::now();
+        minuto++;
+    }
+    cout << "Tempo: " << minuto << ":" ;
+
+    if(duracao.count() < 10) {
+        cout << "0";
+    }
+    cout << duracao.count() << "                       " << endl;
+}
+
+void primeiromapa(int m[ALTURA][LARGURA], StatusPersonagem &personagem){
+
+    int mapa1[ALTURA][LARGURA] = {
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,1,1,1,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,5,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    };
+
+    for(int i=0; i<=ALTURA; i++){
+        for(int j=0; j<LARGURA; j++){
+            m[i][j] = mapa1[i][j];
+        }
+    }
+
+    // posição inicial do personagem
+    personagem.pontoPersonagem.x = 1;
+    personagem.pontoPersonagem.y = 2;
+}
+
+void segundomapa(int m[ALTURA][LARGURA], StatusPersonagem &personagem,bool revelado[ALTURA][LARGURA], StatusInimigos inimigo[INIMIGOS]){
+
+    int mapa2[ALTURA][LARGURA] = {
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    };
+
+    for(int i=0; i<=ALTURA; i++){
+        for(int j=0; j<LARGURA; j++){
+            m[i][j] = mapa2[i][j];
+        }
+    }
+
+    for(int i = 0; i < ALTURA; i++) {
+        for(int j = 0; j < LARGURA; j++) {
+            revelado[i][j] = false;
+        }
+    }
+    for(int i = 0; i < 3; i++){
+        inimigo[i].vivo = false;
+    }
+
+    // posição inicial do personagem
+    personagem.pontoPersonagem.x = 1;
+    personagem.pontoPersonagem.y = 2;
+}
+
+void terceiromapa(int m[ALTURA][LARGURA], StatusPersonagem &personagem, bool revelado[ALTURA][LARGURA],StatusInimigos inimigo[INIMIGOS]){
+
+    int mapa3[ALTURA][LARGURA] = {
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+    };
+
+    for(int i=0; i<ALTURA; i++){
+        for(int j=0; j<LARGURA; j++){
+            m[i][j] = mapa3[i][j];
+        }
+    }
+
+    for(int i = 0; i < ALTURA; i++) {
+        for(int j = 0; j < LARGURA; j++) {
+            revelado[i][j] = false;
+        }
+    }
+    for(int i = 0; i < INIMIGOS; i++){
+    if(i != 4){  // Mantém apenas o boss (inimigo[4]) ativo
+        inimigo[i].vivo = false;
+
+    }
+}
+    // posição inicial do personagem
+    personagem.pontoPersonagem.x = 12;
+    personagem.pontoPersonagem.y = 17;
+}
+
+void revelarAreaInicial(StatusPersonagem &personagem, bool revelado[ALTURA][LARGURA], int dificuldade) {
+    int visaoPadrao = 4;
+    int visaoSandbox = 100;
+    int visao;
+
+    if (dificuldade == 1){
+        visao = visaoSandbox;
+    } else {
+        visao = visaoPadrao;
+    }
+
+    for(int i = personagem.pontoPersonagem.x - visao; i <= personagem.pontoPersonagem.x + visao; i++) {
+        for(int j = personagem.pontoPersonagem.y - visao; j <= personagem.pontoPersonagem.y + visao; j++) {
+            if(i >= 0 && i < ALTURA && j >= 0 && j < LARGURA) {
+                revelado[i][j] = true;
+            }
+        }
+    }
+}
+
+void melhorarAtributos(int &Upgrade, StatusPersonagem &personagem, StatusItems itens){
+    while (Upgrade > 0) {
+        system("cls"); // Limpa a tela antes de mostrar o menu
+
+        printarBordaMenu();
+
+        Status(personagem, itens, Upgrade);
+
+        posicao(0, 0);
+
+        cout << "Pontos restantes: " << Upgrade << endl << endl;
+        cout << "Escolha um atributo para melhorar:" << endl << endl;
+        cout << "   1 - Ataque (+5)" << endl;
+        cout << "   2 - Vida maxima (+10)" << endl;
+        cout << "   3 - Armadura (+1)" << endl;
+        posicao(0, 29); cout << "Pressione qualquer outra tecla para retornar" << endl;
+
+        char tecla = getch();
+
+        if (tecla == 0 || tecla == -32) {
+            getch(); // descarta o segundo código da tecla especial
+            continue; // volta para o menu sem fazer nada
+        }
+
+        switch(tecla) {
+            case '1':
+                personagem.ataque += 5;
+                Upgrade--;
+                system("cls");
+                break;
+
+            case '2':
+                personagem.VidaMaxima += 10;
+                Upgrade--;
+                system("cls");
+                break;
+
+            case '3':
+                personagem.armadura += 1;
+                Upgrade--;
+                system("cls");
+                break;
+
+            default: system("cls"); return;
+        }
+    }
+}
+
+void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int m[ALTURA][LARGURA], bool revelado[ALTURA][LARGURA], char tecla,int &mapaatual, int &Upgrade, int dificuldade) {
 
     bool emCombate = false;
 
@@ -502,6 +852,7 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
         int newY = personagem.pontoPersonagem.y;
 
         switch (tecla) {
+            case 'l': case 'L': melhorarAtributos(Upgrade, personagem, Items); break;
             case 72: case 'w': case 'W': newX--; break; // Cima
             case 80: case 's': case 'S': newX++; break; // Baixo
             case 75: case 'a': case 'A': newY--; break; // Esquerda
@@ -525,18 +876,26 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
         if(newX >= 0 && newX < ALTURA && newY >= 0 && newY < LARGURA) {
 
             //Apaga mensagens da parte inferior da tela ao andar
-            posicao(0,26); cout << "                                                                 ";
-            posicao(0,27); cout << "                                                                 ";
-            posicao(0,28); cout << "                                                                 ";
-            posicao(0,29); cout << "                                                                 ";
+            posicao(0,26); cout << "                                                                                                    ";
+            posicao(0,27); cout << "                                                                                                    ";
+            posicao(0,28); cout << "                                                                                                    ";
+            posicao(0,29); cout << "                                                                                                    ";
 
-            if(m[newX][newY] != 1 && m[newX][newY] != 0) {  // Permite movimento em qualquer tile que não seja parede
+            if(m[newX][newY] != 1 && m[newX][newY] != 3) {  // Permite movimento em qualquer tile que não seja parede
                 personagem.pontoPersonagem.x = newX;
                 personagem.pontoPersonagem.y = newY;
 
+                int visaoPadrao = 4, visaoSandbox = 100, visao;
+
+                if (dificuldade == 1){
+                    visao = visaoSandbox;
+                } else {
+                    visao = visaoPadrao;
+                }
+
                 // Revela área ao redor (5x5)
-                for (int i = personagem.pontoPersonagem.x - 2; i <= personagem.pontoPersonagem.x + 2; i++) {
-                    for (int j = personagem.pontoPersonagem.y - 2; j <= personagem.pontoPersonagem.y + 2; j++) {
+                for (int i = personagem.pontoPersonagem.x - visao; i <= personagem.pontoPersonagem.x + visao; i++) {
+                    for (int j = personagem.pontoPersonagem.y - visao; j <= personagem.pontoPersonagem.y + visao; j++) {
                         if (i >= 0 && i < ALTURA && j >= 0 && j < LARGURA) {
                             revelado[i][j] = true;
                         }
@@ -544,9 +903,33 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
                 }
 
                 // Verifica armadilhas
-                if(m[personagem.pontoPersonagem.x][personagem.pontoPersonagem.y] == 4) {
+                if(m[personagem.pontoPersonagem.x][personagem.pontoPersonagem.y] == 9) {
                     personagem.vida -= 10;
-                    posicao(2,26); cout << "Voce pisou em uma armadilha!   Perdeu 10 de vida.                    ";
+                    posicao(2,26); cout << "Voce pisou em uma armadilha!   Perdeu 10 de vida.                        ";
+                }
+
+                if(m[personagem.pontoPersonagem.x][personagem.pontoPersonagem.y] == 5){
+                    posicao(2,26); cout << "Deseja ir para proxima fase?                                             ";
+                    posicao(2,27); cout << "1 - Sim                                                                  ";
+
+                    switch(tecla){
+                        case '1':
+                            switch (mapaatual){
+                                case 1:
+                                    limparTela(0,0,80,30);
+                                    segundomapa(m, personagem, revelado,inimigo);
+                                    mapaatual++;
+                                    revelarAreaInicial(personagem, revelado, dificuldade); break;
+                                case 2:
+                                    limparTela(0,0,80,30);
+                                    terceiromapa(m, personagem, revelado, inimigo);
+                                    mapaatual++;
+                                    limparTela(0,0,20,30);
+                                    revelarAreaInicial(personagem, revelado, dificuldade); break;
+                            }
+                        case '2': break;
+                        default: break;
+                    }
                 }
             }
         }
@@ -579,50 +962,135 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
     }
 }
 
-void salvarPontuacao(StatusPersonagem personagem) {
-    ofstream arquivo("pontuacao.txt", ios::app);
-    if (arquivo.is_open()) {
-        arquivo << personagem.nome << ": " << personagem.Score << endl;
-        arquivo.close();
-    }
-}
+void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int EspicialAtaque, int AumentaProbabilidadeAtaqueCombate, int BotasDeAgilidadeCombate, int minuto, int dificuldade){
+    bool Entrandocombate = true;
+    for (int i = 0; i < INIMIGOS; i++) {
+        if (personagem.pontoPersonagem.x == inimigo[i].pontoInimigos.x &&
+            personagem.pontoPersonagem.y == inimigo[i].pontoInimigos.y &&
+            inimigo[i].vivo == true) {
+            system("cls");
+            int round = 0;
+            while(Entrandocombate){
 
-void fimDeJogo(StatusPersonagem& personagem, bool venceu) {
-    system("cls");
-    cout << "Fim de jogo! " << (venceu ? "Você venceu!" : "Você morreu!") << endl;
-    cout << "Sua pontuação final foi de: " << personagem.Score << " pts." << endl;
+                int acerto = 0;
+                round++;
+                posicao(2,11);
+                cout << "Ataques Especiais:" << EspicialAtaque << "                                   Round:" << round << "              ";
+                posicao(2,12);
+                cout << "Vida Jogador:" << personagem.vida << "/" << personagem.VidaMaxima << "                                Vida inimigo: " << inimigo[i].vida << "                   ";
+                posicao(2,14);
+                cout << "1 - Atacar" << endl
+                     << "  2 - Curar" << endl
+                     // dobra o dano causado  e o uso e limitado
+                     << "  3 - Ataque Especial" << endl;
+                //deixar mais organizado
+                cout << "  ";
 
-    cout << "Digite seu nome: ";
-    cin >> personagem.nome;
+                char tecla = getch();
 
-    if (personagem.nome == "apagarArquivo") {
-        ofstream arquivo("pontuacao.txt", ios::trunc);
-        arquivo.close();
-        cout << "Pontuações resetadas!" << endl;
-    } else if (personagem.nome == "rodadaTeste"){
-        cout << "Sua pontuação nao foi salva!" << endl;
-    }else {
-        salvarPontuacao(personagem);
-        cout << "Pontuação salva!" << endl;
-    }
-}
+                if (tecla == 0 || tecla == -32) {
+                    getch(); // descarta o segundo código da tecla especial
+                    continue; // volta para o menu sem fazer nada
+                }
 
-void cronometro(auto &inicio, int minuto = 0) {
-    posicao(0, 0);
-    // Espera por um segundo antes de mostrar o tempo
-    auto agora = chrono::steady_clock::now();
-    auto duracao = chrono::duration_cast<chrono::seconds>(agora - inicio);
+                switch(tecla){
 
-    if(duracao.count() == 60) {
-        inicio = chrono::steady_clock::now();
-        minuto++;
-    }
-    cout << "Tempo: " << minuto << ":" ;
+                    //ataque normal
+                    case '1':{
 
-    if(duracao.count() < 10) {
-        cout << "0";
-    }
-    cout << duracao.count() << endl;
+                        //variavel para acerto de ataque
+                        acerto = rand()%9+1+AumentaProbabilidadeAtaqueCombate;
+
+                        if(acerto > 3){
+                            inimigo[i].vida -= personagem.ataque;
+                            posicao(2,21);
+                            cout << "Voce acertou                                 ";
+                        } else {
+                            posicao(2,21);
+                            cout << "Voce errou                                 ";
+                        }
+
+                        acerto = rand()%9+1;
+                        if(acerto > 3){
+                            personagem.vida = personagem.vida - (armaduraPotente(inimigo[i].vida, personagem.armadura));
+                            posicao(2,19);
+                            cout << "inimigo acertou                                 ";
+                        } else {
+                            posicao(2,19);
+                            cout << "O inimigo errou                            ";
+                        }
+
+                        //verifica se o inimigo morreu
+                        if(inimigo[i].vida <= 0){
+                            inimigo[i].vivo = false;
+                            system("cls");
+                            personagem.Score += inimigo[i].experiencia - minuto;
+                            personagem.experiencia += 15;
+                            Entrandocombate = false;
+                        }
+                        //verifica a vida do personagem
+                        if(personagem.vida <= 0){
+                            Entrandocombate = false;
+                        }
+
+                        break;
+
+                    }
+                    //curar
+                    case '2':{
+
+                        if(Items.PocaoCura > 0){
+                            Items.PocaoCura--;
+                            personagem.vida += 50;
+                            if(personagem.vida > personagem.VidaMaxima){
+                                personagem.vida = personagem.VidaMaxima;
+                            }
+                        }
+
+                        acerto = rand()%5+1;
+
+                        if(acerto > 3){
+                            personagem.vida -= (inimigo[i].ataque - personagem.armadura);
+                            posicao(2,19);
+                            cout << "inimigo acerto                                 ";
+                        } else {
+                            posicao(2,19);
+                            cout << "O inimigo erro                            ";
+                        }
+                        if(personagem.vida <= 0){
+                            Entrandocombate = false;
+                        }
+
+                        break;
+
+                    }
+                   //Ataque Especial
+                   case '3': {
+                        if(EspicialAtaque > 0){
+                            personagem.vida -= (inimigo[i].ataque - personagem.armadura);
+                            posicao(2,19);
+                            cout << "inimigo acerto                             ";
+                            inimigo[i].vida -= personagem.ataque*2;
+                            EspicialAtaque--;
+
+                            if(inimigo[i].vida <= 0){
+                                inimigo[i].vivo = false;
+                                system("cls");
+                                personagem.Score += inimigo[i].experiencia - minuto;
+                                personagem.experiencia += 15;
+                                Entrandocombate = false;
+                            }
+                            if(personagem.vida <= 0){
+                               Entrandocombate = false;
+
+                            }
+                            break;
+                        }
+                   }
+                }
+            }//while
+        }//if
+    }//for
 }
 
 int main(){
@@ -643,61 +1111,96 @@ int main(){
         //FIM: COMANDOS PARA REPOSICIONAR O CURSOR NO INICIO DA TELA
     ///ALERTA: NAO MODIFICAR O TRECHO DE CODIGO, ACIMA.
 
-    StatusPersonagem personagem = {1, 5, 100, 0, 0, 100, 0, {1, 3}}; // nivel, ataque, vida, armadura, experiencia, VidaMaxima, Score, localizacao (cordenadas x e y);
-    StatusItems Items ={1, 1, 1, {2, 28}, {14, 4}, {2, 33}};
-    StatusInimigos inimigo[INIMIGOS] = {0};
 
-    for (int i = 0; i < INIMIGOS; i++){
-        inimigo[i].vida = 10 * (i + 1);
-        inimigo[i].ataque = 5 * (i + 1);
-        inimigo[i].vivo = true;
-        inimigo[i].visivel = false;
-    }
 
-    inimigo[0].pontoInimigos = {3, 11};
-    inimigo[1].pontoInimigos = {12, 6};
-    inimigo[2].pontoInimigos = {10, 20};
-    inimigo[3].pontoInimigos = {18, 11};
-    inimigo[4].pontoInimigos = {20, 38};
-
-    printarMenuInicial();
+    int dificuldade = printarMenuInicial();
     //Mapa do jogo
     int m[ALTURA][LARGURA] = {
-        {1,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,0,0},
-        {1,2,2,2,2,2,1,0,0,1,2,2,2,1,0,0,0,1,2,2,2,4,2,2,4,2,2,1,1,1,0,1,2,4,2,4,2,1,0,0},
-        {1,2,2,2,2,2,3,3,3,3,2,2,2,1,0,0,0,1,2,4,2,4,2,2,4,2,2,3,2,1,0,1,4,2,2,2,2,3,3,7},
-        {1,2,2,2,2,2,1,0,0,1,2,2,2,1,0,0,0,1,2,4,2,4,2,2,4,2,2,1,1,1,0,1,2,4,2,4,2,1,0,7},
-        {1,1,1,3,1,1,1,0,0,1,2,2,2,3,3,3,3,3,2,4,2,2,2,2,4,2,2,1,0,0,0,1,1,1,1,1,1,1,0,7},
-        {0,0,0,3,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,3,1,1,0,0,0,0,0,0,0,0,0,0,0,7},
-        {0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,1,1,1,1,1,1,1,1,0,0,0,7},
-        {0,0,0,1,1,3,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,1,2,2,2,2,2,2,6,7,7,7,7},
-        {0,0,0,1,2,2,1,2,2,2,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,3,0,0,1,2,2,2,2,2,2,1,0,0,0,0},
-        {0,0,0,1,2,1,1,2,1,2,1,0,0,0,0,0,0,1,2,2,2,2,2,3,3,3,3,3,3,2,2,2,2,2,2,1,0,0,0,0},
-        {0,0,0,1,2,2,2,2,1,2,1,0,0,0,0,0,0,1,2,4,2,4,2,1,0,0,0,0,1,2,2,2,2,2,2,1,0,0,0,0},
-        {0,0,0,1,1,1,1,2,1,2,1,0,3,3,3,3,3,3,2,4,2,4,2,1,0,0,0,0,1,2,2,2,2,2,2,1,0,0,0,0},
-        {0,0,0,1,2,2,2,2,1,2,3,3,3,0,0,0,0,1,2,2,2,2,2,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0},
-        {0,0,0,1,3,1,1,1,1,1,1,0,3,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,1,2,1,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,1,1,1,0,0,0,1,1,1,3,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,1,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,1,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {0,0,0,0,0,0,0,0,0,1,2,2,2,2,2,3,3,3,0,0,0,0,0,0,0,0,0,1,2,4,2,4,2,2,2,4,2,4,2,1},
-        {0,0,0,0,0,0,0,0,0,1,2,2,2,2,2,1,0,3,0,0,0,0,0,0,0,0,0,1,2,2,2,2,2,4,2,4,2,2,2,1},
-        {0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,0,0,1,2,2,2,4,2,4,2,2,2,4,2,1},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,2,4,2,2,2,4,2,1,0,0,1,2,4,2,2,2,2,2,4,2,2,2,1},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,4,4,2,4,2,4,2,1,0,0,1,2,4,2,4,2,4,2,2,2,4,2,1},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,2,2,2,4,2,2,2,3,3,3,3,2,2,2,2,2,2,2,4,2,2,2,1},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1}
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,1,1,1,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     };
+
+    int visaoPadrao = 4, visaoSandbox = 100, visao;
+    StatusPersonagem personagem = {1, 0, 100, 0, 0, 0, 0, {1,3}}; // nivel, ataque, vida, armadura, experiencia, VidaMaxima, Score, localizacao (cordenadas x e y);
+    StatusItems Items ={1, 1, 1, {1, 29}, {10, 76}, {12,76},1, 1, 1, 1, {21, 10}, {19, 22}, {19, 62}, {3, 22} };
+    StatusInimigos inimigo[INIMIGOS] = {0};
+
+    if (dificuldade == 1){
+        personagem.ataque = 999;
+        personagem.VidaMaxima = 999;
+        personagem.vida = 999;
+        visao = visaoSandbox;
+    } else {
+        personagem.ataque = 5;
+        personagem.VidaMaxima = 100;
+        visao = visaoPadrao;
+    }
+
+    primeiromapa(m, personagem);
+    int mapaatual = 1;
+
+    for (int i = 0; i < INIMIGOS; i++){
+        if(i > 4){
+            inimigo[i].vida = 30;
+            inimigo[i].ataque = 15;
+            inimigo[i].vivo = true;
+            inimigo[i].visivel = false;
+        }else{
+            inimigo[i].vida = 10 * (i + 1);
+            inimigo[i].ataque = 5 * (i + 1);
+            inimigo[i].vivo = true;
+            inimigo[i].visivel = false;
+        }
+    }
+    inimigo[0].pontoInimigos = {13, 19}; inimigo[0].experiencia = 10;
+    inimigo[1].pontoInimigos = {5, 37};  inimigo[1].experiencia = 15;
+    inimigo[2].pontoInimigos = {19,39};  inimigo[2].experiencia = 20;
+    inimigo[3].pontoInimigos = {5,74};   inimigo[3].experiencia = 25;
+    inimigo[4].pontoInimigos = {12, 57}; inimigo[4].experiencia = 100; ///Boss
+    inimigo[5].pontoInimigos = {21, 16}; inimigo[5].experiencia = 10;
+    inimigo[6].pontoInimigos = {3, 25};  inimigo[6].experiencia = 15;
+    inimigo[7].pontoInimigos = {21, 39}; inimigo[7].experiencia = 20;
+    inimigo[8].pontoInimigos = {12, 59}; inimigo[8].experiencia = 25;
 
     bool revelado[ALTURA][LARGURA] = {}; // Matriz de visibilidade do mapa (false = oculto, true = revelado)
     int proximoNivel = 2; //Variavel nivel do perosnagem
-    bool EspadaColetada = false, PocaoColetada = false, ItemSecretoColetado = false; //variaveis de coletas de itens
+    bool EspadaColetada = false, PocaoColetada = false, ItemSecretoColetado = false, Escudo = false,BotasDeAgilidade = false, CristalVida = false, AumentaProbabilidadeAtaque = false; //variaveis de coletas de itens
     char tecla;// Variavel para tecla precionada
+    //variaveis de rankup
+    int Upgrade = 0;
+    int EspicialAtaque = 0; bool ganharAtaqueEspecial = true;
+    //combate
+    // o inimigo vai ter desvantagem de ataque em -1 quando forem coletados
+    int BotasDeAgilidadeCombate = 0;
+    // o jogador vai ter vantagens de ataque em +1quando forem coletados;
+    int AumentaProbabilidadeAtaqueCombate = 0;
 
-    // Revela 2 caracteres pra cima, baixo, direita e esquerda do jogador
-    for (int i = personagem.pontoPersonagem.x - 3; i <= personagem.pontoPersonagem.x + 3; i++) {
-        for (int j = personagem.pontoPersonagem.y - 3; j <= personagem.pontoPersonagem.y + 3; j++) {
+
+    for (int i = personagem.pontoPersonagem.x - visao; i <= personagem.pontoPersonagem.x + visao; i++) {
+        for (int j = personagem.pontoPersonagem.y - visao; j <= personagem.pontoPersonagem.y + visao; j++) {
             if (i >= 0 && i < ALTURA && j >= 0 && j < LARGURA) {
                 revelado[i][j] = true;
             }
@@ -710,6 +1213,11 @@ int main(){
     while (true){
 		posicao(0, 0);
 
+        if (personagem.ataque == 30 && ganharAtaqueEspecial == true){
+            EspicialAtaque += 4;
+            ganharAtaqueEspecial = false;
+        }
+
 		cronometro(inicio, minuto);
 
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -717,67 +1225,115 @@ int main(){
         for (int i = 0; i < ALTURA; i++) {
             for (int j = 0; j < LARGURA; j++) {
                 if (i == personagem.pontoPersonagem.x && j == personagem.pontoPersonagem.y){
+                    mudarCor(hConsole, personagem.cor);
                     cout << char(36); // Personagem
-                }else if (i == inimigo[0].pontoInimigos.x && j == inimigo[0].pontoInimigos.y && inimigo[0].vivo){//inimigo 1
+                    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
+                }else if (i == inimigo[0].pontoInimigos.x && j == inimigo[0].pontoInimigos.y && inimigo[0].vivo && mapaatual == 1){//inimigo 1
                     if (revelado[i][j]){
                         inimigo[0].visivel = true;  SetConsoleTextAttribute(hConsole, 0x0A); //Verde Claro
                         cout << "I";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
                     }else{  cout << " ";}
-                }else if (i == inimigo[1].pontoInimigos.x && j == inimigo[1].pontoInimigos.y && inimigo[1].vivo){//inimigo 2
+                }else if (i == inimigo[1].pontoInimigos.x && j == inimigo[1].pontoInimigos.y && inimigo[1].vivo && mapaatual == 1){//inimigo 2
                     if (revelado[i][j]){
                         inimigo[1].visivel = true;  SetConsoleTextAttribute(hConsole, 0x02); // Verde mais escuro
                         cout << "I";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
                     }else{  cout << " ";}
-                }else if (i == inimigo[2].pontoInimigos.x && j == inimigo[2].pontoInimigos.y && inimigo[2].vivo){//inimigo 3
+                }else if (i == inimigo[2].pontoInimigos.x && j == inimigo[2].pontoInimigos.y && inimigo[2].vivo && mapaatual == 1){//inimigo 3
                     if (revelado[i][j]){
                         inimigo[2].visivel = true;  SetConsoleTextAttribute(hConsole, 0x0E); // Amarelo Claro
                         cout << "I";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
                     }else{  cout << " ";}
-                }else if (i == inimigo[3].pontoInimigos.x && j == inimigo[3].pontoInimigos.y && inimigo[3].vivo){//inimigo 4
+                }else if (i == inimigo[3].pontoInimigos.x && j == inimigo[3].pontoInimigos.y && inimigo[3].vivo && mapaatual == 1){//inimigo 4
                     if (revelado[i][j]){
                         inimigo[3].visivel = true;  SetConsoleTextAttribute(hConsole, 0x06); // Amarelo Mais escuro
                         cout << "I";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
                     }else{  cout << " ";}
-                }else if (i == inimigo[4].pontoInimigos.x && j == inimigo[4].pontoInimigos.y && inimigo[4].vivo){ //chefao
+                }else if (i == inimigo[4].pontoInimigos.x && j == inimigo[4].pontoInimigos.y && inimigo[4].vivo && mapaatual == 3){ //chefao
                     if (revelado[i][j]){
-                        inimigo[4].visivel = true;  SetConsoleTextAttribute(hConsole, 0x04); // Vermelho
-                        cout << "B";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
+                        inimigo[4].visivel = true;  SetConsoleTextAttribute(hConsole, 0x04 && mapaatual == 3); // Vermelho
+                        cout << "B";    SetConsoleTextAttribute(hConsole, 0x0f);    // Branco
                     }else{  cout << " ";}
-                }else if (i == Items.pontoEspada.x && j == Items.pontoEspada.y){    //Espada
+                }else if (i == Items.pontoEspada.x && j == Items.pontoEspada.y && mapaatual == 1){    //Espada
                     if(EspadaColetada == false && revelado[i][j]){
                         cout << "E";
                     }else{  cout << " ";}
-                }else if (i == Items.pontoPocaoCura.x && j == Items.pontoPocaoCura.y){  //Pocao de cura
+                }else if (i == Items.pontoPocaoCura.x && j == Items.pontoPocaoCura.y && mapaatual == 1){  //Pocao de cura
                     if(PocaoColetada == false && revelado[i][j]){
                         cout << "c";
                     }else{  cout << " ";}
-                }else if (i == Items.pontoPowerUp.x && j == Items.pontoPowerUp.y){  //Power-up
+                }else if (i == Items.pontoPowerUp.x && j == Items.pontoPowerUp.y && mapaatual == 2){  //Power-up
                     if(ItemSecretoColetado == false && revelado[i][j]){
                         cout << "Y";
                     }else{  cout << " ";}
-                }else if (revelado[i][j]) {
-                    switch (m[i][j]) {
-                        case 0: cout << " "; break; // Espaco vazio
-                        case 1: cout << char(219); break; // Parede
-                        case 2: cout << "."; break; // caminho
-                        case 3: cout << char(176); break; // Passagem
-                        case 4: SetConsoleTextAttribute(hConsole, 0x04); cout << char(158); SetConsoleTextAttribute(hConsole, 0x0F); break; // Armadilha
-                        case 6: cout << char(219); break; // Parede falsa
-                        case 7: cout << " "; break;
-                    }
-                } else {    cout << " ";}   // Área não revelada
+                }
+                else if (i == Items.pontoEscudo.x && j == Items.pontoEscudo.y && mapaatual == 1){  //Power-up
+                    if(Escudo == false && revelado[i][j]){
+                        cout << "O";
+                    }else{  cout << " ";}
+                }
+                else if (i == Items.pontoBotasDeAgilidade.x && j == Items.pontoBotasDeAgilidade.y && mapaatual == 2){  //Power-up
+                    if(BotasDeAgilidade == false && revelado[i][j]){
+                        cout << "A";
+                    }else{  cout << " ";}
+                }else if (i == Items.pontoCristalVida.x && j == Items.pontoCristalVida.y && mapaatual == 1){  //Power-up
+                    if(CristalVida == false && revelado[i][j]){
+                        cout << "V";
+                    }else{  cout << " ";}
+                }else if (i == Items.pontoAumentaProbabilidadeAtaque.x && j == Items.pontoAumentaProbabilidadeAtaque.y && mapaatual == 2){  //Power-up
+                    if(AumentaProbabilidadeAtaque == false && revelado[i][j]){
+                        cout << "T";
+                    }else{  cout << " ";}
+                }
+
+                else if (i == inimigo[5].pontoInimigos.x && j == inimigo[5].pontoInimigos.y && inimigo[5].vivo && mapaatual == 2){//inimigo 1
+                    if (revelado[i][j]){
+                        inimigo[5].visivel = true; SetConsoleTextAttribute(hConsole, 0x0A); //Verde Claro
+                        cout << "I";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
+                    }else{  cout << " ";}
+                }else if (i == inimigo[6].pontoInimigos.x && j == inimigo[6].pontoInimigos.y && inimigo[6].vivo  && mapaatual == 2){//inimigo 1
+                    if (revelado[i][j]){
+                        inimigo[6].visivel = true;  SetConsoleTextAttribute(hConsole, 0x02);
+                        cout << "I";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
+                    }else{  cout << " ";}
+                }else if (i == inimigo[7].pontoInimigos.x && j == inimigo[7].pontoInimigos.y && inimigo[7].vivo && mapaatual == 2){//inimigo 1
+                    if (revelado[i][j]){
+                        inimigo[7].visivel = true;  SetConsoleTextAttribute(hConsole, 0x0E);
+                        cout << "I";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
+                    }else{  cout << " ";}
+                }else if (i == inimigo[8].pontoInimigos.x && j == inimigo[8].pontoInimigos.y && inimigo[8].vivo && mapaatual == 2){//inimigo 1
+                    if (revelado[i][j]){
+                        inimigo[8].visivel = true;  SetConsoleTextAttribute(hConsole, 0x06);
+                        cout << "I";    SetConsoleTextAttribute(hConsole, 0x0F);    // Branco
+                    }else{  cout << " ";}
+                }
+
+
+
+                else if (revelado[i][j]) {
+                    switch (m[i][j]){
+                        case 0: cout<<"."; break; //caminho
+                        case 1: cout<<char(219); break; //parede
+                        case 3: cout<< " "; break; //sem chão
+                        case 4: cout << char(176); break; // Ponte
+                        case 5: mudarCor(hConsole, 0x06); cout << char (219); SetConsoleTextAttribute(hConsole, 0x0F); break; //alçapão
+                    }  //fim switch
+                }   else {    cout << " ";}   // Área não revelada
 
             }
             cout << "\n";
         }
 
-        //area secetra
-        if(ItemSecretoColetado == false){
-            if (personagem.pontoPersonagem.x == 2 && personagem.pontoPersonagem.y == 33){
+        if(ItemSecretoColetado == false && mapaatual == 2){
+            if (personagem.pontoPersonagem.x == Items.pontoPowerUp.x  && personagem.pontoPersonagem.y == Items.pontoPowerUp.y){
                 personagem.nivel++;
-                personagem.Score += 10 - minuto;
+                personagem.Score += 20 - minuto;
+                Upgrade++;
                 ItemSecretoColetado = true;
-                posicao(2,26); cout << "Voce coleteou um item secreto, recebeu um nivel!                 ";
+                posicao(2,26); cout << "Voce coleteou um item secreto, recebeu um nivel!                                                 ";
+                posicao(2,27); cout << "                                                                                                 ";
+                personagem.cor = 14;
+                Sleep(1500);
+                limparBufferDeInput();
             }
         }
 
@@ -786,113 +1342,110 @@ int main(){
             personagem.nivel++;
             personagem.experiencia = 0;
         }
+
         //Level up
         if(personagem.nivel == proximoNivel){
-            personagem.ataque += 5;
-            personagem.VidaMaxima += 10;
-            personagem.armadura += 1;
-            personagem.Score += 20 - minuto;
+            personagem.Score += 40 - minuto;
             proximoNivel++;
-            posicao(2,26); cout << "Voce subiu de nivel, seus status aumentaram!                    ";
+            Upgrade++;
+            posicao(2,26); cout << "Voce subiu de nivel, Aperte L para aumentar seus status!                                             ";
+            posicao(2,27); cout << "                                                                                                     ";
+            Sleep(1500);
+            limparBufferDeInput();
         }
-
-        //Dano do inimigo ao player e Dano do player ao inimigo
-        for (int i = 0; i < INIMIGOS; i++) {
-            if (personagem.pontoPersonagem.x == inimigo[i].pontoInimigos.x &&
-                personagem.pontoPersonagem.y == inimigo[i].pontoInimigos.y &&
-                inimigo[i].vivo) {
-
-
-                int totalDanoCausado = 0;
-                int totalDanoRecebido = 0;
-                int turno = 1;
-
-                // Loop de combate por turnos
-                while (inimigo[i].vivo && personagem.vida > 0) {
-                    // Ataque do jogador
-                    int danoTurno = personagem.ataque;
-                    inimigo[i].vida -= danoTurno;
-                    totalDanoCausado += danoTurno;
-
-                    // Ataque do inimigo
-                    int danoInimigoTurno = 0;
-                    if (inimigo[i].ataque > personagem.armadura) {
-                        danoInimigoTurno = inimigo[i].ataque - personagem.armadura;
-                        personagem.vida -= danoInimigoTurno;
-                        totalDanoRecebido += danoInimigoTurno;
-                    }
-
-                    posicao(2, 26); cout << "Turno " << turno << ": Voce causou " << danoTurno << " (" << totalDanoCausado << " total)";
-                    posicao(2, 27); cout << "Turno " << turno << ": Inimigo causou " << danoInimigoTurno << " (" << totalDanoRecebido << " total)";
-
-                    Sleep(1000); /// Tempo de 2s pra ler as msgm
-
-                    // Verifica morte do inimigo
-                    if (inimigo[i].vida <= 0) {
-                        posicao(2, 28);
-                        cout << "[INIMIGO DERROTADO!] XP: +15 | Pontos: +" << (5 * (i + 1));
-                        inimigo[i].vivo = false;
-                        personagem.experiencia += 15;
-                        personagem.Score += 5 * (i + 1);
-                    }
-
-                    turno++; // Passa o turno
-
-                    // Limpa apenas as linhas de status
-                    posicao(2, 26); cout << "                                                          ";
-                    posicao(2, 27); cout << "                                                          ";
-                }
-
-                // Mensagem final do combate
-                posicao(2, 26);
-                cout << "Dano total causado: " << totalDanoCausado;
-                posicao(2, 27);
-                cout << "Dano total recebido: " << totalDanoRecebido;
-                Sleep(1000);
-
-                // Limpa area de mensagens
-                posicao(0, 26); cout << "                                                                 ";
-                posicao(0, 27); cout << "                                                                 ";
-                posicao(0, 28); cout << "                                                                 ";
-
-                limparBufferDeInput();
-                break;
-            }
-        }
-
 
         //Itens coletaveis
-        if(EspadaColetada == false){
+        if(Escudo == false && mapaatual == 1){
+            if (personagem.pontoPersonagem.x == Items.pontoEscudo.x && personagem.pontoPersonagem.y == Items.pontoEscudo.y){
+                Escudo = true;
+                personagem.armadura += 1;
+                personagem.experiencia += 15;
+                personagem.Score += 20 - minuto;
+                posicao(2,26); cout << "Escudo Coletado!                                                                                 ";
+                posicao(2,27); cout << "(+1 de Armadura)                                                                                 ";
+                personagem.cor = 9;
+                Sleep(1500);
+                limparBufferDeInput();
+            }
+        }
+        if(BotasDeAgilidade == false && mapaatual == 2){
+            if (personagem.pontoPersonagem.x == Items.pontoBotasDeAgilidade.x && personagem.pontoPersonagem.y == Items.pontoBotasDeAgilidade.y){
+                BotasDeAgilidade = true;
+                BotasDeAgilidadeCombate += 1;
+                personagem.experiencia += 15;
+                personagem.Score += 20 - minuto;
+                posicao(2,26); cout << "Botas De Agilidade coletadas!                                                                    ";
+                posicao(2,27); cout << "(+1 de chance de desviar)                                                                        ";
+                personagem.cor = 2;
+                Sleep(1500);
+                limparBufferDeInput();
+            }
+        }
+        if(CristalVida == false && mapaatual == 1){
+            if (personagem.pontoPersonagem.x == Items.pontoCristalVida.x && personagem.pontoPersonagem.y == Items.pontoCristalVida.y){
+                CristalVida = true;
+                personagem.VidaMaxima += 20;
+                personagem.vida += 20;
+                personagem.experiencia += 15;
+                personagem.Score += 20 - minuto;
+                posicao(2,26); cout << "Cristal de vida coletado!                                                                        ";
+                posicao(2,27); cout << "(+20 de vida maxima)                                                                             ";
+                personagem.cor = 4;
+                Sleep(1500);
+                limparBufferDeInput();
+            }
+        }
+        if(AumentaProbabilidadeAtaque == false  && mapaatual == 2){
+            if (personagem.pontoPersonagem.x == Items.pontoAumentaProbabilidadeAtaque.x && personagem.pontoPersonagem.y == Items.pontoAumentaProbabilidadeAtaque.y){
+                AumentaProbabilidadeAtaque = true;
+                AumentaProbabilidadeAtaqueCombate += 1;
+                personagem.experiencia += 15;
+                personagem.Score += 20 - minuto;
+                posicao(2,26); cout << "Tecnica de combate coletada!                                                                     ";
+                posicao(2,27); cout << "(+1 de chance de acerta um ataque) (Somente na dificuldade media ou superior)           ";
+                personagem.cor = 6;
+                Sleep(1500);
+                limparBufferDeInput();
+            }
+        }
+        if(EspadaColetada == false && mapaatual == 1){
             if (personagem.pontoPersonagem.x == Items.pontoEspada.x && personagem.pontoPersonagem.y == Items.pontoEspada.y){
                 EspadaColetada = true;
                 personagem.ataque += 5;
                 personagem.experiencia += 15;
-                personagem.Score += 10 - minuto;
-                posicao(2,26); cout << "Espada coletada (+5 de Dano)!                                    ";
+                personagem.Score += 20 - minuto;
+                posicao(2,26); cout << "Espada coletada!                                                                                 ";
+                posicao(2,27); cout << "(+5 de Dano)                                                                                     ";
+                personagem.cor = 5;
+                Sleep(1500);
+                limparBufferDeInput();
             }
         }
-        if (PocaoColetada == false){
+        if (PocaoColetada == false && mapaatual == 1){
             if (personagem.pontoPersonagem.x == Items.pontoPocaoCura.x && personagem.pontoPersonagem.y == Items.pontoPocaoCura.y){
                 PocaoColetada = true;
                 Items.PocaoCura++;
                 personagem.experiencia += 15;
-                personagem.Score += 10 - minuto;
-                posicao(2,26); cout << "Voce coletou uma pocao de cura!                                  ";
+                personagem.Score += 20 - minuto;
+                posicao(2,26); cout << "Pocao de cura coletada!                                                                          ";
+                posicao(2,27); cout << "                                                                                                 ";
+                Sleep(1500);
+                limparBufferDeInput();
             }
         }
 
         // Movimentação
         if (_kbhit()) { //Se estiver pressionando uma tecla
             tecla = getch(); //Recebe o valor da tecla pressionada
-            movimentacao(personagem, inimigo, Items, m, revelado, tecla);
+            movimentacao(personagem, inimigo, Items, m, revelado, tecla, mapaatual, Upgrade, dificuldade);
+            Combate(personagem , inimigo, Items, EspicialAtaque, AumentaProbabilidadeAtaqueCombate, BotasDeAgilidadeCombate, minuto, dificuldade);
         }
 
         printarBordaMenu();
-        Status(personagem, Items);
+        Status(personagem, Items, Upgrade);
 
         if(personagem.vida <= 0){
             fimDeJogo(personagem, false);
-
             return 0;
 
         }else if(inimigo[4].vivo == false){
