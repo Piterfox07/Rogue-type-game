@@ -944,8 +944,19 @@ void movimentacao(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS]
     }
 }
 
-void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int EspicialAtaque, int AumentaProbabilidadeAtaqueCombate, int BotasDeAgilidadeCombate, int minuto){
+void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], StatusItems &Items, int AumentaProbabilidadeAtaqueCombate, int BotasDeAgilidadeCombate, int minuto){
     bool Entrandocombate = true;
+    int EspicialAtaque = 0; bool ganharAtaqueEspecial = true;
+    int acerto;
+
+    if (personagem.ataque > 30 && ganharAtaqueEspecial == true){
+        EspicialAtaque += 4;
+        ganharAtaqueEspecial = false;
+        if (dificuldade == 1){
+            EspicialAtaque += 995;
+        }
+    }
+
     for (int i = 0; i < INIMIGOS; i++) {
         if (personagem.pontoPersonagem.x == inimigo[i].pontoInimigos.x &&
             personagem.pontoPersonagem.y == inimigo[i].pontoInimigos.y &&
@@ -954,19 +965,12 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
             int round = 0;
             while(Entrandocombate){
 
-                int acerto = 0;
-                round++;
-                posicao(2,11);
-                cout << "Ataques Especiais:" << EspicialAtaque << "                                   Round:" << round << "              ";
-                posicao(2,12);
-                cout << "Vida Jogador:" << personagem.vida << "/" << personagem.VidaMaxima << "                                Vida inimigo: " << inimigo[i].vida << "                   ";
-                posicao(2,14);
-                cout << "1 - Atacar" << endl
-                     << "  2 - Curar" << endl
-                     // dobra o dano causado  e o uso e limitado
-                     << "  3 - Ataque Especial" << endl;
-                //deixar mais organizado
-                cout << "  ";
+                posicao(2,11); cout << "Ataques Especiais:" << EspicialAtaque << "                                   Round:" << round << "              ";
+                posicao(2,12); cout << "Vida Jogador:" << personagem.vida << "/" << personagem.VidaMaxima << "                                Vida inimigo: " << inimigo[i].vida << "                   ";
+                posicao(2,14); cout << "1 - Atacar" << endl
+                                    << "  2 - Curar" << endl
+                                    << "  3 - Ataque Especial" << endl;// dobra o dano causado  e o uso e limitado
+                               cout << "  ";
 
                 char tecla = getch();
 
@@ -979,28 +983,30 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
 
                     //ataque normal
                     case '1':{
+                        round++;
+                        
+                        if (dificuldade == 3)
+                            //variavel para acerto de ataque
+                            acerto = rand()%9+1+AumentaProbabilidadeAtaqueCombate;
 
-                        //variavel para acerto de ataque
-                        acerto = rand()%9+1+AumentaProbabilidadeAtaqueCombate;
+                            if(acerto > 3){
+                                inimigo[i].vida -= personagem.ataque;
+                                posicao(2,21);
+                                cout << "Voce acertou                                                 ";
+                            } else {
+                                posicao(2,21);
+                                cout << "Voce errou                                                   ";
+                            }
 
-                        if(acerto > 3){
-                            inimigo[i].vida -= personagem.ataque;
-                            posicao(2,21);
-                            cout << "Voce acertou                                 ";
-                        } else {
-                            posicao(2,21);
-                            cout << "Voce errou                                 ";
-                        }
-
-                        acerto = rand()%9+1;
-                        if(acerto > 3){
-                            personagem.vida = personagem.vida - (armaduraPotente(inimigo[i].vida, personagem.armadura));
-                            posicao(2,19);
-                            cout << "inimigo acertou                                 ";
-                        } else {
-                            posicao(2,19);
-                            cout << "O inimigo errou                            ";
-                        }
+                            acerto = rand()%9+1;
+                            if(acerto > 3){
+                                personagem.vida = personagem.vida - (armaduraPotente(inimigo[i].vida, personagem.armadura));
+                                posicao(2,19);
+                                cout << "inimigo acertou                                              ";
+                            } else {
+                                posicao(2,19);
+                                cout << "O inimigo errou                                              ";
+                            }
 
                         //verifica se o inimigo morreu
                         if(inimigo[i].vida <= 0){
@@ -1020,7 +1026,7 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                     }
                     //curar
                     case '2':{
-
+                        round++;
                         if(Items.PocaoCura > 0){
                             Items.PocaoCura--;
                             personagem.vida += 50;
@@ -1034,10 +1040,10 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                         if(acerto > 3){
                             personagem.vida -= (inimigo[i].ataque - personagem.armadura);
                             posicao(2,19);
-                            cout << "inimigo acerto                                 ";
+                            cout << "O inimigo acertou                                            ";
                         } else {
                             posicao(2,19);
-                            cout << "O inimigo erro                            ";
+                            cout << "O inimigo errou                                              ";
                         }
                         if(personagem.vida <= 0){
                             Entrandocombate = false;
@@ -1049,6 +1055,7 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                    //Ataque Especial
                    case '3': {
                         if(EspicialAtaque > 0){
+                            round++;
                             personagem.vida -= (inimigo[i].ataque - personagem.armadura);
                             posicao(2,19);
                             cout << "inimigo acerto                             ";
@@ -1067,6 +1074,8 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
 
                             }
                             break;
+                        } else {
+                            posicao(2,19); cout << "Voce nao possui cargas de Ataque Especial suficientes.";
                         }
                    }
                 }
@@ -1171,7 +1180,6 @@ int main(){
     char tecla;// Variavel para tecla precionada
     //variaveis de rankup
     int Upgrade = 0;
-    int EspicialAtaque = 0; bool ganharAtaqueEspecial = true;
     //combate
     // o inimigo vai ter desvantagem de ataque em -1 quando forem coletados
     int BotasDeAgilidadeCombate = 0;
@@ -1192,11 +1200,6 @@ int main(){
 
     while (true){
 		posicao(0, 0);
-
-        if (personagem.ataque == 30 && ganharAtaqueEspecial == true){
-            EspicialAtaque += 4;
-            ganharAtaqueEspecial = false;
-        }
 
 		cronometro(inicio, minuto);
 
@@ -1418,7 +1421,7 @@ int main(){
         if (_kbhit()) { //Se estiver pressionando uma tecla
             tecla = getch(); //Recebe o valor da tecla pressionada
             movimentacao(personagem, inimigo, Items, m, revelado, tecla, mapaatual, Upgrade);
-            Combate(personagem , inimigo, Items, EspicialAtaque, AumentaProbabilidadeAtaqueCombate, BotasDeAgilidadeCombate, minuto);
+            Combate(personagem , inimigo, Items, AumentaProbabilidadeAtaqueCombate, BotasDeAgilidadeCombate, minuto);
         }
 
         printarBordaMenu();
@@ -1432,7 +1435,6 @@ int main(){
             fimDeJogo(personagem, true);
 
             return 0;
-
         }
     }
 
