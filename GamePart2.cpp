@@ -13,8 +13,9 @@
 
 using namespace std;
 
-template <typename ar>
+auto inicio = chrono::steady_clock::now();  // Marca o tempo de inC-cio
 
+template <typename ar>
 ar armaduraPotente(ar& a, ar b){
     return a - b;
 }
@@ -1004,7 +1005,6 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                                     personagem.Score += inimigo[i].experiencia - minuto;
                                     personagem.experiencia += 15 * (i +1);
                                     if(inimigo[4].vivo == false){
-                                        fimDeJogo(personagem, true);
                                         Entrandocombate = false;
                                         break;
                                     }
@@ -1041,7 +1041,6 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                                 personagem.Score += inimigo[i].experiencia - minuto;
                                 personagem.experiencia += 15 * (i +1);
                                 if(inimigo[4].vivo == false){
-                                    fimDeJogo(personagem, true);
                                     Entrandocombate = false;
                                     break;
                                 }
@@ -1116,7 +1115,6 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                                 personagem.Score += inimigo[i].experiencia - minuto;
                                 personagem.experiencia += 15 * (i +1);
                                 if(inimigo[4].vivo == false){
-                                    fimDeJogo(personagem, true);
                                     Entrandocombate = false;
                                     break;
                                 }
@@ -1130,7 +1128,6 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                             if(personagem.vida <= 0){
                                 fimDeJogo(personagem, false);
                                 return;
-
                             }
 
 
@@ -1262,7 +1259,6 @@ int main(){
         }
     }
 
-    auto inicio = chrono::steady_clock::now();  // Marca o tempo de inC-cio
     int minuto = 0;
 
     while (true){
@@ -1498,6 +1494,14 @@ int main(){
 
         printarBordaMenu();
         Status(personagem, Items, Upgrade);
+
+        if(inimigo[4].vivo == false){
+            fimDeJogo(personagem, true);
+            return 0;
+        } else if(personagem.vida <= 0){
+            fimDeJogo(personagem, false);
+            return 0;
+        }
     }
 
     return 0;
