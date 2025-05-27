@@ -1003,6 +1003,11 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                                     system("cls");
                                     personagem.Score += inimigo[i].experiencia - minuto;
                                     personagem.experiencia += 15 * (i +1);
+                                    if(inimigo[4].vivo == false){
+                                        fimDeJogo(personagem, true);
+                                        Entrandocombate = false;
+                                        break;
+                                    }
                                     Entrandocombate = false;
                                     break;
                                 }
@@ -1035,6 +1040,11 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                                 system("cls");
                                 personagem.Score += inimigo[i].experiencia - minuto;
                                 personagem.experiencia += 15 * (i +1);
+                                if(inimigo[4].vivo == false){
+                                    fimDeJogo(personagem, true);
+                                    Entrandocombate = false;
+                                    break;
+                                }
                                 Entrandocombate = false;
                                 break;
                             }
@@ -1053,7 +1063,8 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
 
                         //verifica a vida do personagem
                         if(personagem.vida <= 0){
-                            Entrandocombate = false;
+                            fimDeJogo(personagem, false);
+                            return;
                         }
 
                     break;
@@ -1068,7 +1079,6 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                             if(personagem.vida > personagem.VidaMaxima){
                                 personagem.vida = personagem.VidaMaxima;
                             }
-                        }
 
                         acerto = rand()%5+1;
 
@@ -1079,7 +1089,11 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                             posicao(2,19); cout << "O inimigo errou!                                                                                                    ";
                         }
                         if(personagem.vida <= 0){
-                            Entrandocombate = false;
+                            fimDeJogo(personagem, false);
+                            return ;
+                        }
+                        } else {
+                            posicao(2,19); cout << "Voce nao tem mais pocoes!                                                                                                    ";
                         }
 
                     break;
@@ -1101,6 +1115,11 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                                 system("cls");
                                 personagem.Score += inimigo[i].experiencia - minuto;
                                 personagem.experiencia += 15 * (i +1);
+                                if(inimigo[4].vivo == false){
+                                    fimDeJogo(personagem, true);
+                                    Entrandocombate = false;
+                                    break;
+                                }
                                 Entrandocombate = false;
                                 break;
                             }
@@ -1109,9 +1128,11 @@ void Combate(StatusPersonagem &personagem, StatusInimigos inimigo[INIMIGOS], Sta
                             posicao(2,19); cout << "O inimigo acertou e causou " << inimigo[i].ataque - personagem.armadura << " de dano.                              ";
 
                             if(personagem.vida <= 0){
-                               Entrandocombate = false;
+                                fimDeJogo(personagem, false);
+                                return;
 
                             }
+
 
                         } else {
                             posicao(2,19); cout << "Voce nao possui cargas de Ataque Especial suficientes.                                          ";
@@ -1477,17 +1498,6 @@ int main(){
 
         printarBordaMenu();
         Status(personagem, Items, Upgrade);
-
-        if(personagem.vida <= 0){
-            fimDeJogo(personagem, false);
-            return 0;
-
-        }else if(inimigo[4].vivo == false){
-            fimDeJogo(personagem, true);
-
-            return 0;
-
-        }
     }
 
     return 0;
